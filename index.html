@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>secret message encoder</title>
+    <style>
+        .enode-decode-cont {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px;
+}
+
+.encodesection,
+.decodesection {
+    width: 45%;
+}
+
+.secret-msg-cont,
+.visible-msg-cont,
+.encoded-message-output,
+.encoded-msg-cont,
+.decoded-message-output {
+    margin-bottom: 15px;
+}
+
+.secret-msg-label,
+.visible-msg-label,
+.encoded-msg-label,
+.decoded-message-output-label,
+.encoded-message-output-label {
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
+}
+
+.generate-hidden-meesage-in-visible-msg-btn,
+.decode-hidden-meesage-in-visible-msg-btn,
+.copy-output-button {
+    cursor: pointer;
+    background-color: #4caf50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    width: fit-content;
+}
+
+.generate-hidden-meesage-in-visible-msg-btn:hover,
+.decode-hidden-meesage-in-visible-msg-btn:hover,
+.copy-output-button:hover {
+    background-color: #45a049;
+}
+
+.encoded-message-output-value,
+.decoded-message-output-value {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    min-height: 30px;
+}
+
+.encoded-message-output,
+.decoded-message-output {
+    display: flex;
+    flex-direction: column;
+}
+
+.copy-output-button {
+    margin-top: 10px;
+}
+
+    </style>
+</head>
+<body>
+    <!-- to sections encode and decode -->
+    <div class="enode-decode-cont">
+        <div class="encodesection">
+            <div class="secret-msg-cont">
+                <div class="secret-msg-label">
+                    Enter your Hidden message
+                </div>
+                <input type="text" id="secretMessage">
+            </div>
+            <div class="visible-msg-cont">
+                <div class="visible-msg-label">
+                    Enter your Visible message
+                </div>
+                <input type="text" id="visibleMessage">
+            </div>
+            <div class="generate-hidden-meesage-in-visible-msg-btn" onclick="geneateEncodedMessage();">Encode</div>
+            <div class="encoded-message-output">
+                <div class="encoded-message-output-label">
+                    Your encoded message is
+                </div>
+                <div class="encoded-message-output-value" id="encodedOutput">
+                    
+                </div>
+                <div class="copy-output-button" onclick="copyEncodedMessage()">Copy</div>
+            </div>
+        </div>
+        <div class="decodesection">
+            <div class="encoded-msg-cont">
+                <div class="encoded-msg-label">
+                    Enter your encoded message
+                </div>
+                <input type="text" id="encodedMessage">
+            </div>
+            <div class="decode-hidden-meesage-in-visible-msg-btn" onclick="decodeEncodedMessage();">Decode</div>
+            <div class="decoded-message-output">
+                <div class="decoded-message-output-label">
+                    Your decoded message is
+                </div>
+                <div class="decoded-message-output-value" id="decodedOutput">
+                    
+                </div>
+                <div class="copy-output-button">Copy</div>
+            </div>
+        </div>
+    </div>
+   <script>
+    function geneateEncodedMessage(){
+        let visibleMessage = document.getElementById("visibleMessage").value;
+        let hiddenMessage = document.getElementById("secretMessage").value;
+        if(visibleMessage == "" || hiddenMessage == ""){
+            alert("Please enter both visible and hidden message");
+            return;
+        }
+        let encodedMessage = encodeMessage(visibleMessage,hiddenMessage);
+        document.getElementById("encodedOutput").innerHTML = encodedMessage;
+    }
+    function copyEncodedMessage(){
+        let encodedMessage = document.getElementById("encodedOutput").innerHTML;
+        if(encodeMessage == "" || encodeMessage == undefined){
+            alert("Please generate encoded message first");
+            return;
+        }
+        navigator.clipboard.writeText(encodedMessage);
+    }
+    function encodeMessage(visibleMessage,hiddenMessage){
+        let binaryFormatOfHiddenMessage = textToBinary(hiddenMessage);
+        let encodedMessage = "";
+        // iterate each character of binary format of hidden message and replace 1 with zero-width space and 0 with zero-width non-joiner
+        for(var i=0;i<binaryFormatOfHiddenMessage.length;i++){
+            if(binaryFormatOfHiddenMessage[i] == "1"){
+                encodedMessage += "​";
+            }else if(binaryFormatOfHiddenMessage[i] == "0"){
+                encodedMessage += "‌";
+            }
+            else{
+                encodedMessage += "‍";
+            }
+        }
+        //  attach visible message to encoded message
+        encodedMessage += visibleMessage;
+        return encodedMessage;
+    }
+    function decodeMessage(message){
+        let binaryFormatOfHiddenMessage = "";
+        for(var i=0;i<message.length;i++){
+            if(message[i] == "‌"){
+                binaryFormatOfHiddenMessage += "0";
+            }else if(message[i] == "​"){
+                binaryFormatOfHiddenMessage += "1";
+            }
+            else if(message[i] == "‍"){
+                binaryFormatOfHiddenMessage += " ";
+            }
+        }
+        let decodedMessage = binaryToText(binaryFormatOfHiddenMessage);
+        return decodedMessage;
+    }
+    function binaryToText(message){
+        var text = "";
+        var messageArray = message.split(" ");
+        for(var i=0;i<messageArray.length;i++){
+            text += String.fromCharCode(parseInt(messageArray[i], 2).toString(10));
+        }
+        return text;
+    }
+    function textToBinary(message){
+        var binaryMessage = "";
+        for(var i=0;i<message.length;i++){
+            binaryMessage += message[i].charCodeAt(0).toString(2) + " ";
+        }
+        return binaryMessage;
+    }
+    function decodeEncodedMessage(){
+        let encodedMessage = document.getElementById("encodedMessage").value;
+        let decodedMessage = decodeMessage(encodedMessage);
+        document.getElementById("decodedOutput").innerHTML = decodedMessage;
+    }
+   </script>
+</body>
+</html>
