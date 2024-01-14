@@ -148,12 +148,12 @@ input {
         // iterate each character of binary format of hidden message and replace 1 with zero-width space and 0 with zero-width non-joiner
         for(var i=0;i<binaryFormatOfHiddenMessage.length;i++){
             if(binaryFormatOfHiddenMessage[i] == "1"){
-                encodedMessage += "​";
+                encodedMessage += getHiddenCharacterForOne();
             }else if(binaryFormatOfHiddenMessage[i] == "0"){
-                encodedMessage += "‌";
+                encodedMessage += getHiddenCharacterForZero();
             }
             else{
-                encodedMessage += "‍";
+                encodedMessage += getHiddenCharacterForSpace();
             }
         }
         //  attach visible message to encoded message
@@ -163,12 +163,12 @@ input {
     function decodeMessage(message){
         let binaryFormatOfHiddenMessage = "";
         for(var i=0;i<message.length;i++){
-            if(message[i] == "‌"){
+            if(message[i] == getHiddenCharacterForZero()){
                 binaryFormatOfHiddenMessage += "0";
-            }else if(message[i] == "​"){
+            }else if(message[i] == getHiddenCharacterForOne()){
                 binaryFormatOfHiddenMessage += "1";
             }
-            else if(message[i] == "‍"){
+            else if(message[i] == getHiddenCharacterForSpace()){
                 binaryFormatOfHiddenMessage += " ";
             }
         }
@@ -194,6 +194,15 @@ input {
         let encodedMessage = document.getElementById("encodedMessage").value;
         let decodedMessage = decodeMessage(encodedMessage);
         document.getElementById("decodedOutput").innerHTML = decodedMessage;
+    }
+    function getHiddenCharacterForOne(){
+        return "‎"
+    }
+    function getHiddenCharacterForZero(){
+        return "‏"
+    }
+    function getHiddenCharacterForSpace(){
+        return "͏"
     }
    </script>
 </body>
