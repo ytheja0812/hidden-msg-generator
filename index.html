@@ -74,6 +74,18 @@ input {
 .copy-output-button {
     margin-top: 10px;
 }
+.hidden-msg-position-radio{
+    width: 30px;
+    margin: 0px;
+}
+
+.hidden-msg-position{
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 10px;
+    align-items: center;
+    justify-content: center;
+}
 
     </style>
 </head>
@@ -93,11 +105,20 @@ input {
                 </div>
                 <input type="text" id="visibleMessage">
             </div>
+            <!-- radio button to append or prepend the hidden message -->
+            <div class="hidden-msg-position">
+                <input type="radio" class="hidden-msg-position-radio" id="prependHidden" name="hidden_message_position" value="prepend" checked="true">
+                <label for="prepend">Prepend</label><br>
+                <input type="radio" class="hidden-msg-position-radio" id="appendHidden" name="hidden_message_position" value="append">
+                <label for="append">Append</label><br>
+            </div>
+            
             <div class="generate-hidden-meesage-in-visible-msg-btn" onclick="geneateEncodedMessage();">Encode</div>
             <div class="encoded-message-output">
                 <div class="encoded-message-output-label">
                     Your encoded message is
                 </div>
+                
                 <div class="encoded-message-output-value" id="encodedOutput">
                     
                 </div>
@@ -131,7 +152,8 @@ input {
             alert("Please enter both visible and hidden message");
             return;
         }
-        let encodedMessage = encodeMessage(visibleMessage,hiddenMessage);
+        let isPrependHidden = document.getElementById("prependHidden").checked;
+        let encodedMessage = encodeMessage(visibleMessage,hiddenMessage,isPrependHidden);
         document.getElementById("encodedOutput").innerHTML = encodedMessage;
     }
     function copyEncodedMessage(){
@@ -142,7 +164,7 @@ input {
         }
         navigator.clipboard.writeText(encodedMessage);
     }
-    function encodeMessage(visibleMessage,hiddenMessage){
+    function encodeMessage(visibleMessage,hiddenMessage,prependHidden){
         let binaryFormatOfHiddenMessage = textToBinary(hiddenMessage);
         let encodedMessage = "";
         // iterate each character of binary format of hidden message and replace 1 with zero-width space and 0 with zero-width non-joiner
@@ -157,7 +179,12 @@ input {
             }
         }
         //  attach visible message to encoded message
-        encodedMessage += visibleMessage;
+        if(prependHidden){
+            encodedMessage = encodedMessage+visibleMessage ;
+        }
+        else{
+            encodedMessage = visibleMessage + encodedMessage;
+        }
         return encodedMessage;
     }
     function decodeMessage(message){
